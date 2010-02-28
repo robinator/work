@@ -1,0 +1,53 @@
+% Assignment 2 - Stereo Algorithm
+% Robert Law
+% CMSC 25030
+% 05.01.2008
+function [output] = stereo(Il, Ir, D, w)
+% Given two images (left and right) a max disparity, and (optionally) a
+% window size, return a disparity image using a window-based, sum of
+% squared differences approach.  Basically we compute the integral image
+% of squared difference for each disparity between 0 and D, and for each
+% pixel, we choose the disparity that minimizes the sum of squared
+% differences (where that sum is derived within some w x w window).
+% The window size can either be given, or, each pixel chooses its own
+% 'optimal' window size (minimial SSD) for itself. Optimality, in this
+% case, is based on the window with the smallest (normalized) SSD.
+
+if (nargin < 4) % see if window size was given
+  w = 0;
+end
+
+[H, W] = size(Il);  % image dimensions
+Il = double(Il);    % convert to double for processing
+Ir = double(Ir);
+
+dMap = ones(H,W, 1+D); % 3d array of (x,y,d) values
+
+for d = 0:D
+    intI = integral_sd(Il, Ir, d); % compute integral image at this disparity
+    for r = 1:H
+        for c = 1:W
+            if w > 0 % given or dynamic?
+                sumSD = ssd(intI,r,c,w);
+            else
+                sumSD = min_window(intI,r,c);
+            end
+            dMap(r,c,d+1) = sumSD; % save the best sum of squared difference
+        end
+    end
+end
+
+outI = zeros(H, W);
+
+scaler = 255/D; 
+for r = 1:H
+    for c = 1:W
+        [minVal minD] = min(dMap(r,c,:)); % save disparity with minimum SSD
+        outI(r,c) = minD * scaler; % normalize disparities from 0 to 255
+    end
+end
+
+output = outI;
+
+return
+

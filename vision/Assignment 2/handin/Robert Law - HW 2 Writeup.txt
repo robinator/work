@@ -1,0 +1,55 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	Assignment 2 - Write Up
+	Robert Law
+	Intro to Computer Vision
+	05.01.08
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+My program implements a window based stereo algorithm using 6 .m files:
+	stereo.m	-- The main working routine. This takes a left and right image, a max disparity, and (optionally) a window size.
+			-- It returns a disparity image created using a window based SSD algorithm.
+	validate.m	-- Helper used to return 'valid' points if a given point is outside the image boundaries
+	ssd.m		-- Computes the sum of squared differences for a point given a window size (assumes the point is in center of window)
+	integral_sd.m	-- Computes the integral image of squared differences given two images, and a disparity
+	min_window.m	-- Returns the sum of squared differences from an 'optimal' window size
+	test.m		-- A driver or tester for stereo()
+
+The main .m file, stereo, creates the disparity image.  It takes two images (left and right), and a maximum disparity value (D) and an optional window size (w), and returns an image representing the disparities.  It can do this either using a fixed window size or by finding an 'optimal' window size per
+pixel. The algorithm uses an integral image for each disparity so that sums of squared difference can be computed quickly in time independent of window
+size (using box-sums).  
+
+The ssd.m file computes the sum of squared differences given a point, an integral image, and a window size using the box-sum method.
+
+The integral_sd.m file computes the integral image of squared difference of the two images using the method described in the class handout.
+
+The min_window.m file returns a minimal sum of squared difference based on finding an 'optimal' window size for a given pixel.  This window size is
+determined by finding the window size (within some range) that has the lowest normalized sum of squared difference.  The ssd of a given window is
+normalized by dividing it by the window size squared.  Without normalization, the smallest window will always have the smallest ssd (because less values
+are being summed in the first place).
+
+When testing the algorithm with different window sizes, one realizes that when the window size is small, the disparity image looks more pixelated and 
+noisy.  The various continguous regions within an image do not appear smooth, but are choppy and rough.  When the window size is large, the regions and
+image are smoother, but sometimes lack the detailed edges or features that a smaller window size provided. Thus, an optimal window size should provide an
+image that is both smooth and detailed.  There doesn't seem to be an optimal window size because it varies per image. A size between 13-17 did seem to 
+yield better results than other smaller or larger sizes on all the images.
+After using the 'optimal' window algorithm I developed, I noticed that, with variable window sizes, the image does seem to show more detail than it's 
+fixed window counterpart. However, the image does seem more splotchy and less smooth (compared to a fixed window size). This might be fixed by biasing
+the algorithm toward larger window sizes (making the image more smooth), but this can be left for a future exercise ;-)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Outputs:
+	fixed_shrub.pgm
+	fixed_meter.pgm
+	fixed_tree.pgm
+	fixed_tsukuba.pgm
+	vary_shrub.pgm
+	vary_meter.pgm
+	vary_tree.pgm
+	vary_tsukuba.pgm
+
+All outputs made with:
+	D = 20;
+	w (fixed) = 15
+	w (vary) = 10-20
+

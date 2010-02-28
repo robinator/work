@@ -1,0 +1,10 @@
+function [ sumSD ] = ssd( I, r, c, w )
+r1 = round(r - w/2);
+c1 = round(c - w/2);
+r2 = round(r + w/2);
+c2 = round(c + w/2);
+
+sumSd = I(r2,c2) - I(r1-1,c2)
+
+
+return

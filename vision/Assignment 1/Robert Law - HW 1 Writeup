@@ -1,0 +1,36 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	Assignment 1 - Write Up
+	Robert Law
+	Intro to Computer Vision
+	04.18.08
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+My program implements the Canny Edge Detection Algorithm using 4 .m files:
+	canny.m		-- The main working routine.  Computes Gaussian convolution, gradients, 
+			-- Non-maximum suppression and hysteresis
+	inside.m	-- Helper used to determine if a given point is inside the image
+	trace.m		-- Recursive function for hysteresis (of low values)
+	test.m		-- A driver or tester for canny()
+
+The main .m file, canny, does the edge detection.  It takes an image, a sigma, and low and high threshold values.
+The inputs are assumed to be valid (we could do error checking, but that is a trivial add-on that doesn't seem necessary
+at this point).  From these, it first makes two Gaussian masks (a horizontal one and a vertical one) and convolves the
+original image with these masks (first the x then the y with the result).  After that, it computes the image gradient, the
+gradient magnitude, and the squared gradient magnitude. You can see the code and comments for more details on how this is
+implemented.  With these items, it performs non-maximum suppression (or local peak detection), by determining whether
+a point is a 'peak' by comparing its squared magnitude to those of its neighbors in the gradient direction.  Once these  possible peaks are identified using NMS, the function thresholds the 'strong' peaks in order to get ride of the little noisy peaks.  It does this using the lo and hi input thresholds where a point is an edge if:  p > hi or p > lo and it's neighbor is an edge. It finds edges by first finding a pixel > hi and 'walks down' the edge of its neighbors until the neighbor is < lo. 
+
+The trace .m file is a recursive function to threshold low peaks. It calls itself for all the neighbors of whatever called
+it and if the criteria are met (neighbor of an edge and over lo), the peak is identified (a pixel is dropped).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Outputs:
+	edge_elephants.pbm
+	edge_bear.pbm
+	edge_boat.pbm
+	edge_tsukuba.pbm
+
+All outputs made with:
+	sigma = 1;
+	lo = 100;
+	hi = 250;
